@@ -1,4 +1,4 @@
-export type MemberPosition = '초원지기' | '목자' | '목원';
+export type MemberPosition = '초원지기' | '목자' | '목원' | '임원단';
 export type MemberGender = '남' | '여';
 
 export interface Member {

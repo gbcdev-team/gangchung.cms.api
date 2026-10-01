@@ -11,6 +11,7 @@ import type { Member } from '@/types/member';
 
 const POSITION_CLASS: Record<Member['position'], string> = {
   초원지기: 'bg-black text-white dark:bg-white dark:text-black',
+  임원단: 'bg-indigo-600 text-white dark:bg-indigo-400 dark:text-indigo-950',
   목자: 'bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900',
   목원: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200',
 };

@@ -25,7 +25,8 @@ import {
 import { getDescendantIds } from '@/libs/member-tree';
 import type { Member, MemberFormInput, MemberPosition } from '@/types/member';
 
-const POSITIONS: MemberPosition[] = ['초원지기', '목자', '목원'];
+const POSITIONS: MemberPosition[] = ['초원지기', '목자', '목원', '임원단'];
+const TOP_LEVEL_POSITIONS: MemberPosition[] = ['초원지기', '임원단'];
 
 const memberFormSchema = z
   .object({
@@ -34,13 +35,13 @@ const memberFormSchema = z
     gender: z.union([z.literal('남'), z.literal('여'), z.literal('')]),
     age_group: z.string().trim(),
     birth_date: z.string(),
-    position: z.enum(['초원지기', '목자', '목원']),
+    position: z.enum(['초원지기', '목자', '목원', '임원단']),
     parent_id: z.string().uuid().nullable(),
   })
-  .refine((v) => (v.position === '초원지기' ? v.parent_id === null : !!v.parent_id), {
-    message: '목자/목원은 상위 리더를 선택해야 합니다.',
-    path: ['parent_id'],
-  });
+  .refine(
+    (v) => (TOP_LEVEL_POSITIONS.includes(v.position) ? v.parent_id === null : !!v.parent_id),
+    { message: '목자/목원은 상위 리더를 선택해야 합니다.', path: ['parent_id'] },
+  );
 
 type MemberFormValues = z.infer<typeof memberFormSchema>;
 
@@ -89,7 +90,7 @@ export default function MemberForm({
 
   const handlePositionChange = (next: MemberPosition) => {
     form.setValue('position', next);
-    if (next === '초원지기') {
+    if (TOP_LEVEL_POSITIONS.includes(next)) {
       form.setValue('parent_id', null);
       return;
     }
@@ -106,7 +107,7 @@ export default function MemberForm({
         age_group: values.age_group,
         birth_date: values.birth_date,
         position: values.position,
-        parent_id: values.position === '초원지기' ? null : values.parent_id,
+        parent_id: TOP_LEVEL_POSITIONS.includes(values.position) ? null : values.parent_id,
       });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : '저장에 실패했습니다.');
@@ -223,7 +224,7 @@ export default function MemberForm({
           )}
         />
 
-        {position !== '초원지기' && (
+        {!TOP_LEVEL_POSITIONS.includes(position) && (
           <FormField
             control={form.control}
             name="parent_id"

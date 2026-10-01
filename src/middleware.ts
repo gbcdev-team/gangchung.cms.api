@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const ADMIN_PATHS = ['/users', '/orders', '/quotes', '/blog', '/products', '/portfolio', '/profile', '/settings'];
+const ADMIN_PATHS = ['/users', '/members', '/profile', '/settings'];
 
 function isPublicApiPath(pathname: string): boolean {
   return pathname.startsWith('/api/v1/') || pathname === '/api/openapi.json';
@@ -78,11 +78,7 @@ export const config = {
     '/api/openapi.json',
     '/api-docs/:path*',
     '/users/:path*',
-    '/orders/:path*',
-    '/quotes/:path*',
-    '/blog/:path*',
-    '/products/:path*',
-    '/portfolio/:path*',
+    '/members/:path*',
     '/profile/:path*',
     '/settings/:path*',
   ],

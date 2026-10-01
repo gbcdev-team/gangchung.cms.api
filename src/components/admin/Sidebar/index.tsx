@@ -11,11 +11,7 @@ type NavItem = { label: string; href: string; external?: boolean };
 
 const NAV_ITEMS: NavItem[] = [
   { label: '유저', href: '/users' },
-  { label: '주문 관리', href: '/orders' },
-  { label: '견적 신청', href: '/quotes' },
-  { label: '소식 (Blog)', href: '/blog' },
-  { label: '상품', href: '/products' },
-  { label: '포트폴리오', href: '/portfolio' },
+  { label: '구성원 관리', href: '/members' },
 ];
 
 type PopupLinkItem = { type: 'link'; label: string; href: string; icon: LucideIcon; external?: boolean };

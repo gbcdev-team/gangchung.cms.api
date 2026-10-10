@@ -1,0 +1,3 @@
+- [env-file-access-restricted](env_file_access_restricted.md) — .env/.env.local/.env.example are Read/Glob/Edit-blocked by permissions here; env-file changes are user-responsibility, not agent-verifiable.
+- [no-bash-tool](no_bash_tool.md) — No Bash tool in this environment; reconstruct "git diff" reviews via Grep/Glob/Read, not actual git commands.
+- [env-var-rename-2026-10](env_var_rename_2026_10.md) — MOCK_EMAIL/MOCK_PASSWORD renamed to EMAIL/PASSWORD on 2026-10-10 across code+docs; .env files unverified.

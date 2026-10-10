@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { signInAction } from './actions';
+import { useState } from "react";
+import Image from "next/image";
+import { signInAction } from "./actions";
 
 export default function SignInPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +20,20 @@ export default function SignInPage() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-10 w-full max-w-md mx-4 sm:mx-0">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">GOSPELFIX Admin</h1>
+        <div className="flex justify-center mb-6">
+          <Image
+            src="/Images/logo.jpg"
+            alt="강청 로고"
+            width={72}
+            height={72}
+            className="rounded-full border border-gray-200 object-cover"
+            priority
+          />
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+          강청 Admin
+        </h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <label className="flex flex-col gap-1.5">

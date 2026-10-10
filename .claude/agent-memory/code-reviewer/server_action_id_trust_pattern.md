@@ -1,0 +1,11 @@
+---
+name: server-action-id-trust-pattern
+description: Server Actions in this repo (e.g. profile/actions.ts) take a caller-supplied row id and pass it straight to admin-client (service-role) queries with no server-side session check binding id to the actual logged-in user.
+type: project
+---
+
+`src/app/(admin)/profile/actions.ts`'s `updateProfileAction(id, fullName, avatarForm, removeAvatar)` accepts `id` from the client (`profile.id` from the `useAuth()` cache) and passes it unchecked into `updateProfile()`/`uploadAvatar()`, both of which use `createAdminClient()` (service role key, RLS bypassed). There is no check that `id` matches the session's actual user — currently low-impact only because [[mock-auth-not-real-session]]-style single-mock-admin auth means there's effectively one user, and `src/middleware.ts`'s matcher (`/profile/:path*`) also covers the Server Action's POST so a fully unauthenticated caller is still blocked.
+
+**Why:** Found during 2026-10-10 review of the profile DB-wiring changeset ([[env-var-rename-2026-10]] era). This is a design smell that becomes a real IDOR (any authenticated-looking caller can overwrite ANY profile row, including flipping another user's `avatar_url`/`full_name`) the moment this repo's "실서비스 전환" (see CLAUDE.md "인증은 현재 Mock" section) happens and real multi-user Supabase Auth sessions land, unless the action is updated at that time to derive `id` server-side from the session instead of trusting the client argument.
+
+**How to apply:** When reviewing future Server Actions that mutate a specific row by id (profile, members, settings, etc.), check whether the id comes from a trusted server-side session/cookie lookup vs. a client-passed argument. Flag client-trusted ids as Major now (low real-world impact today) and remind that it must be fixed before/at the real-auth migration, not treated as already resolved tech debt. Also check: `src/app/(admin)/profile/actions.ts`'s `uploadAvatar` call path (`src/libs/supabase/queries/storage.ts`) has no server-side file size/MIME-type validation — only the client component (`profile/page.tsx`) checks 5MB/image-type before calling the action, so a direct call to the action bypasses those limits entirely (service-role Storage upload = no RLS size/type guard either).

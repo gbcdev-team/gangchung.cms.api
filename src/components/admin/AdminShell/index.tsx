@@ -1,10 +1,14 @@
-'use client';
+"use client";
 
-import { Menu } from 'lucide-react';
-import { useMobileMenu } from '@/components/admin/MobileMenuContext';
-import { useAuth } from '@/hooks/useAuth';
+import { Menu } from "lucide-react";
+import { useMobileMenu } from "@/components/admin/MobileMenuContext";
+import { useAuth } from "@/hooks/useAuth";
 
-export default function AdminShell({ children }: { children: React.ReactNode }) {
+export default function AdminShell({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { isOpen, open, close } = useMobileMenu();
   const { profile } = useAuth();
 
@@ -15,13 +19,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           <div className="w-7 h-7 rounded-full bg-black overflow-hidden flex items-center justify-center text-white font-bold text-xs shrink-0">
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={profile.avatar_url} alt="프로필" className="w-full h-full object-cover" />
+              <img
+                src={profile.avatar_url}
+                alt="프로필"
+                className="w-full h-full object-cover"
+              />
             ) : (
-              <span>G</span>
+              <span>강</span>
             )}
           </div>
           <div>
-            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">GOSPELFIX</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">
+              강청
+            </p>
             <p className="text-xs text-gray-400 dark:text-gray-500">ADMIN</p>
           </div>
         </div>
@@ -36,7 +46,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
           onClick={close}
         />
       )}

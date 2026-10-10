@@ -27,5 +27,5 @@ export async function signInAction(
     secure: process.env.NODE_ENV === "production",
   });
 
-  redirect("/users");
+  redirect("/members");
 }

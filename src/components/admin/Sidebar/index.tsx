@@ -1,31 +1,56 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { BookOpen, ChevronUp, ExternalLink, LucideIcon, LogOut, Settings, User, X } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { useMobileMenu } from '@/components/admin/MobileMenuContext';
+import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  BookOpen,
+  ChevronUp,
+  ExternalLink,
+  LucideIcon,
+  LogOut,
+  Settings,
+  User,
+  X,
+} from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useMobileMenu } from "@/components/admin/MobileMenuContext";
 
 type NavItem = { label: string; href: string; external?: boolean };
 
-const NAV_ITEMS: NavItem[] = [
-  { label: '유저', href: '/users' },
-  { label: '구성원 관리', href: '/members' },
-];
+const NAV_ITEMS: NavItem[] = [{ label: "구성원 관리", href: "/members" }];
 
-type PopupLinkItem = { type: 'link'; label: string; href: string; icon: LucideIcon; external?: boolean };
-type PopupActionItem = { type: 'action'; label: string; icon: LucideIcon; action: 'signOut' };
+type PopupLinkItem = {
+  type: "link";
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  external?: boolean;
+};
+type PopupActionItem = {
+  type: "action";
+  label: string;
+  icon: LucideIcon;
+  action: "signOut";
+};
 type PopupItem = PopupLinkItem | PopupActionItem;
 
-const isLinkItem = (item: PopupItem): item is PopupLinkItem => item.type === 'link';
-const isActionItem = (item: PopupItem): item is PopupActionItem => item.type === 'action';
+const isLinkItem = (item: PopupItem): item is PopupLinkItem =>
+  item.type === "link";
+const isActionItem = (item: PopupItem): item is PopupActionItem =>
+  item.type === "action";
 
 const POPUP_ITEMS: PopupItem[] = [
-  { type: 'link',   label: '설정',       href: '/settings', icon: Settings },
-  { type: 'link',   label: '프로필 설정', href: '/profile',  icon: User     },
-  { type: 'link',   label: 'API 문서',   href: '/api-docs', icon: BookOpen, external: true },
-  { type: 'action', label: '로그아웃',   icon: LogOut,      action: 'signOut' },
+  { type: "link", label: "설정", href: "/settings", icon: Settings },
+  { type: "link", label: "프로필 설정", href: "/profile", icon: User },
+  {
+    type: "link",
+    label: "API 문서",
+    href: "/api-docs",
+    icon: BookOpen,
+    external: true,
+  },
+  { type: "action", label: "로그아웃", icon: LogOut, action: "signOut" },
 ];
 
 export default function Sidebar() {
@@ -41,8 +66,8 @@ export default function Sidebar() {
         setPopupOpen(false);
       }
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   return (
@@ -53,7 +78,7 @@ export default function Sidebar() {
         bg-white dark:bg-gray-800 shadow-sm flex flex-col p-4
         rounded-l-2xl lg:rounded-2xl
         transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+        ${isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
       `}
     >
       {/* 모바일 전용 닫기 버튼 */}
@@ -70,22 +95,26 @@ export default function Sidebar() {
       {/* 네비게이션 */}
       <nav className="flex flex-col gap-1 flex-1">
         {NAV_ITEMS.map(({ label, href, external }) => {
-          const active = !external && (pathname === href || pathname.startsWith(href + '/'));
+          const active =
+            !external && (pathname === href || pathname.startsWith(href + "/"));
           return (
             <Link
               key={href}
               href={href}
               onClick={close}
-              {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
+              {...(external && {
+                target: "_blank",
+                rel: "noopener noreferrer",
+              })}
               className={`flex items-center gap-2.5 px-3 py-3 rounded-lg text-sm transition-colors ${
                 active
-                  ? 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white font-medium'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200'
+                  ? "bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white font-medium"
+                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200"
               }`}
             >
               <span
                 className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
-                  active ? 'bg-black dark:bg-white' : 'bg-transparent'
+                  active ? "bg-black dark:bg-white" : "bg-transparent"
                 }`}
               />
               {label}
@@ -95,28 +124,44 @@ export default function Sidebar() {
       </nav>
 
       {/* 하단 로고 버튼 + 팝업 */}
-      <div ref={popupRef} className="relative border-t border-gray-100 dark:border-gray-700 pt-3 mt-2">
+      <div
+        ref={popupRef}
+        className="relative border-t border-gray-100 dark:border-gray-700 pt-3 mt-2"
+      >
         {/* 팝업 메뉴 */}
         {popupOpen && (
           <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div className="py-1">
               {POPUP_ITEMS.filter(isLinkItem).map((linkItem) => {
-                const active = pathname === linkItem.href || pathname.startsWith(linkItem.href + '/');
+                const active =
+                  pathname === linkItem.href ||
+                  pathname.startsWith(linkItem.href + "/");
                 return (
                   <Link
                     key={linkItem.href}
                     href={linkItem.href}
-                    onClick={() => { setPopupOpen(false); close(); }}
-                    {...(linkItem.external && { target: '_blank', rel: 'noopener noreferrer' })}
+                    onClick={() => {
+                      setPopupOpen(false);
+                      close();
+                    }}
+                    {...(linkItem.external && {
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                    })}
                     className={`flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
                       active
-                        ? 'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white font-medium'
-                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        ? "bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white font-medium"
+                        : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                     }`}
                   >
                     <linkItem.icon size={14} />
                     <span className="flex-1">{linkItem.label}</span>
-                    {linkItem.external && <ExternalLink size={12} className="text-gray-400 dark:text-gray-500 shrink-0" />}
+                    {linkItem.external && (
+                      <ExternalLink
+                        size={12}
+                        className="text-gray-400 dark:text-gray-500 shrink-0"
+                      />
+                    )}
                   </Link>
                 );
               })}
@@ -126,7 +171,10 @@ export default function Sidebar() {
                 return (
                   <button
                     key={actionItem.action}
-                    onClick={() => { setPopupOpen(false); signOut(); }}
+                    onClick={() => {
+                      setPopupOpen(false);
+                      signOut();
+                    }}
                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <actionItem.icon size={14} />
@@ -146,18 +194,24 @@ export default function Sidebar() {
           <div className="w-9 h-9 rounded-full bg-black overflow-hidden flex items-center justify-center text-white font-bold text-sm shrink-0">
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={profile.avatar_url} alt="프로필" className="w-full h-full object-cover" />
+              <img
+                src={profile.avatar_url}
+                alt="프로필"
+                className="w-full h-full object-cover"
+              />
             ) : (
-              <span>{profile?.full_name?.[0]?.toUpperCase() ?? ''}</span>
+              <span>{profile?.full_name?.[0]?.toUpperCase() ?? ""}</span>
             )}
           </div>
           <div className="flex-1 text-left min-w-0">
-            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight truncate">{profile?.full_name ?? ''}</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight truncate">
+              {profile?.full_name ?? ""}
+            </p>
             <p className="text-xs text-gray-400 dark:text-gray-500">ADMIN</p>
           </div>
           <ChevronUp
             size={14}
-            className={`text-gray-400 dark:text-gray-500 transition-transform shrink-0 ${popupOpen ? 'rotate-180' : ''}`}
+            className={`text-gray-400 dark:text-gray-500 transition-transform shrink-0 ${popupOpen ? "rotate-180" : ""}`}
           />
         </button>
       </div>

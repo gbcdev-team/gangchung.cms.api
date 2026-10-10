@@ -23,7 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 이 레포는 사실상 두 가지 역할을 한다.
 
-1. **어드민 UI** (`src/app/(admin)/`) — `members`, `users`, `profile`, `settings`. 로그인한 관리자가 교회 구성원 데이터를 관리하는 내부 화면.
+1. **어드민 UI** (`src/app/(admin)/`) — `members`, `profile`, `settings`. 로그인한 관리자가 교회 구성원 데이터를 관리하는 내부 화면.
 2. **공개 콘텐츠 API** (`src/app/api/v1/`) — 외부 소비자(다른 서비스)가 `X-API-Key` 헤더로 호출하는 읽기 전용 REST API. 라우트가 리소스별로 하드코딩되어 있지 않고 **단일 동적 라우트** `[resource]/route.ts`, `[resource]/[identifier]/route.ts`로 모든 리소스를 처리한다.
 
 새 공개 API 리소스를 추가할 때 코드를 새로 짤 필요가 없다 — Supabase의 `statkit_content_api_configs` 테이블에 행 하나를 추가하면 끝난다(`src/libs/supabase/queries/content-api-configs.ts`):
@@ -40,7 +40,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 인증은 현재 Mock — 실제 세션 아님
 
-`src/middleware.ts`와 `src/app/api/auth/me/route.ts`는 `mock-auth` 쿠키(`true`/미설정)로만 로그인 여부를 판단한다. 실제 Supabase Auth 세션을 쓰지 않는다 — middleware.ts 주석에 "실서비스 전환 시 Supabase 세션 쿠키로 교체 필요"라고 명시되어 있다. `/`, `/sign/in`, 어드민 경로(`/users`, `/members`, `/profile`, `/settings`), `/api-docs`의 접근 제어가 전부 이 쿠키 하나에 의존한다.
+`src/middleware.ts`와 `src/app/api/auth/me/route.ts`는 `mock-auth` 쿠키(`true`/미설정)로만 로그인 여부를 판단한다. 실제 Supabase Auth 세션을 쓰지 않는다 — middleware.ts 주석에 "실서비스 전환 시 Supabase 세션 쿠키로 교체 필요"라고 명시되어 있다. `/`, `/sign/in`, 어드민 경로(`/members`, `/profile`, `/settings`), `/api-docs`의 접근 제어가 전부 이 쿠키 하나에 의존한다.
 
 클라이언트 쪽 인증 상태는 **TanStack Query**로 관리한다(`src/hooks/useAuth.ts`, `src/hooks/useUser.ts`가 `/api/auth/me`를 쿼리 키 `["auth","me"]`로 캐싱). Recoil은 package.json에 의존성이 없고 코드베이스 어디에서도 쓰이지 않는다 — 인증/프로필 접근은 반드시 이 두 훅을 통해서만 한다.
 
@@ -86,3 +86,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `SUPABASE_SERVICE_ROLE_KEY` — 어드민 클라이언트 (서버 전용, 절대 클라이언트에 노출 금지)
 - `INTERNAL_API_KEY` — 공개 API(`/api/v1/*`) `X-API-Key` 검증값
 - `EMAIL`, `PASSWORD` — 목업 로그인 계정 (실제 인증 전환 전까지만 사용)
+- `ADMIN_PROFILE_ID` — `gangchung_profiles` 테이블에서 목업 로그인 사용자와 매핑되는 행의 UUID (미설정 시 `/api/auth/me`가 DB 없이 고정값으로 폴백)

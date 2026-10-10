@@ -138,7 +138,7 @@ export function ProfileForm({
 ## 보안 — 이 프로젝트에 실제로 있는 것만
 
 - **CSRF**: Next.js Server Action은 same-origin 요청만 허용하는 자체 보호가 있어 별도 CSRF 토큰 구현이 필요 없다. 원본 문서의 커스텀 CSRF 미들웨어는 이 프로젝트에 없고 만들 계획도 없다.
-- **Rate limiting**: 미구현. `/sign/in`의 `signInAction`은 환경변수(`MOCK_EMAIL`/`MOCK_PASSWORD`) 비교만 하는 mock 인증이라(CLAUDE.md "인증 — 현재 상태는 전체가 mock" 참고) 아직 해당 없음. 실 Supabase 인증 전환 시 별도로 검토할 사항이다.
+- **Rate limiting**: 미구현. `/sign/in`의 `signInAction`은 환경변수(`EMAIL`/`PASSWORD`) 비교만 하는 mock 인증이라(CLAUDE.md "인증 — 현재 상태는 전체가 mock" 참고) 아직 해당 없음. 실 Supabase 인증 전환 시 별도로 검토할 사항이다.
 - **서버 재검증**: Server Action 안에서 zod(또는 동등한 타입 체크)로 다시 검증 — 클라이언트 검증은 UX용, 서버 검증이 실제 방어선.
 
 ## 체크리스트

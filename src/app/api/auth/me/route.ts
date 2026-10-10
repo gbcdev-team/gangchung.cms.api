@@ -5,7 +5,7 @@ import type { UserProfile } from "@/types/auth";
 
 export const dynamic = "force-dynamic";
 
-const mockEmail = process.env.MOCK_EMAIL ?? "admin@gospelfix.com";
+const mockEmail = process.env.EMAIL ?? "admin@gospelfix.com";
 
 const MOCK_USER = {
   id: "mock-user-id",

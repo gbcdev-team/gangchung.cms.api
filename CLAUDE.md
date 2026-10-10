@@ -85,4 +85,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — 브라우저/서버 공용 Supabase 클라이언트
 - `SUPABASE_SERVICE_ROLE_KEY` — 어드민 클라이언트 (서버 전용, 절대 클라이언트에 노출 금지)
 - `INTERNAL_API_KEY` — 공개 API(`/api/v1/*`) `X-API-Key` 검증값
-- `MOCK_EMAIL`, `MOCK_PASSWORD` — 목업 로그인 계정 (실제 인증 전환 전까지만 사용)
+- `EMAIL`, `PASSWORD` — 목업 로그인 계정 (실제 인증 전환 전까지만 사용)

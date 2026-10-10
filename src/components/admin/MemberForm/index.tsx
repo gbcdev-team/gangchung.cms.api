@@ -340,7 +340,7 @@ export default function MemberForm({
           />
         )}
 
-        <div className="flex gap-2 pt-2">
+        <div className="flex justify-end gap-2 pt-2">
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "저장 중..." : submitLabel}
           </Button>

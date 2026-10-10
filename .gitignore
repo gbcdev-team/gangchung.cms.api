@@ -144,3 +144,6 @@ vite.config.ts.timestamp-*
 
 # ETC
 .DS_Store
+
+# 구성원 개인정보가 담긴 DB 백업/덤프 (레포가 public이라 커밋 금지)
+supabase/backups/

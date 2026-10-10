@@ -97,10 +97,9 @@ export default function MembersView({ tree, allMembers }: MembersViewProps) {
         <Input
           id="member-search"
           type="search"
-          placeholder="이름 또는 전화번호로 검색"
+          placeholder="이름으로 검색"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="max-w-sm"
         />
         <p className="mt-1.5 text-xs text-gray-400" aria-live="polite">
           {isSearching

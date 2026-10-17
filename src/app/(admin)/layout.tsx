@@ -1,18 +1,20 @@
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { MobileMenuProvider } from "@/components/admin/MobileMenuContext";
 import AdminShell from "@/components/admin/AdminShell";
 import Sidebar from "@/components/admin/Sidebar";
+import { createClient } from "@/libs/supabase/server";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
-  const isAuthenticated = cookieStore.get("mock-auth")?.value === "true";
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!isAuthenticated) {
+  if (!user) {
     redirect("/sign/in");
   }
 

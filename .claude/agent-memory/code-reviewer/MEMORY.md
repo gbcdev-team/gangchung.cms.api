@@ -1,4 +1,6 @@
 - [env-file-access-restricted](env_file_access_restricted.md) — .env/.env.local/.env.example are Read/Glob/Edit-blocked by permissions here; env-file changes are user-responsibility, not agent-verifiable.
 - [no-bash-tool](no_bash_tool.md) — No Bash tool in this environment; reconstruct "git diff" reviews via Grep/Glob/Read, not actual git commands.
 - [env-var-rename-2026-10](env_var_rename_2026_10.md) — MOCK_EMAIL/MOCK_PASSWORD renamed to EMAIL/PASSWORD on 2026-10-10 across code+docs; .env files unverified.
-- [server-action-id-trust-pattern](server_action_id_trust_pattern.md) — profile/actions.ts trusts client-supplied row id for admin-client mutations with no session binding; latent IDOR once real auth lands; also no server-side avatar size/MIME validation.
+- [server-action-id-trust-pattern](server_action_id_trust_pattern.md) — RESOLVED 2026-10-17 (real auth migration fixed it); kept as a pattern reminder for future Server Actions mutating "current user" rows.
+- [signup-role-self-escalation](signup_role_self_escalation.md) — RESOLVED 2026-10-17: signup role now capped at 초원지기/목자 in the DB trigger itself (migration 20261017050000), not just the UI.
+- [permissions-ts-shape](permissions_ts_shape.md) — src/libs/permissions.ts conventions (REQUIRED_PARENT_POSITION, self-edit exception, ownTreeIds fail-safe) — read before reviewing future permission changes.

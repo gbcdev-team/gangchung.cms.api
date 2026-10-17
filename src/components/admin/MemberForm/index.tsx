@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getDescendantIds } from "@/libs/member-tree";
+import { MEMBER_POSITIONS, TOP_LEVEL_POSITIONS } from "@/libs/member-roles";
 import { cn } from "@/libs/utils";
 import type { Member, MemberFormInput, MemberPosition } from "@/types/member";
 
@@ -88,9 +89,6 @@ function BirthDatePicker({
   );
 }
 
-const POSITIONS: MemberPosition[] = ["초원지기", "목자", "목원", "임원단"];
-const TOP_LEVEL_POSITIONS: MemberPosition[] = ["초원지기", "임원단"];
-
 const memberFormSchema = z
   .object({
     name: z.string().trim().min(1, "이름을 입력해주세요."),
@@ -98,7 +96,7 @@ const memberFormSchema = z
     gender: z.union([z.literal("남"), z.literal("여"), z.literal("")]),
     age_group: z.string().trim(),
     birth_date: z.string(),
-    position: z.enum(["초원지기", "목자", "목원", "임원단"]),
+    position: z.enum(["초원지기", "목자", "목원", "임원단", "목사", "전도사"]),
     parent_id: z.string().uuid().nullable(),
   })
   .refine(
@@ -292,7 +290,7 @@ export default function MemberForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {POSITIONS.map((p) => (
+                  {MEMBER_POSITIONS.map((p) => (
                     <SelectItem key={p} value={p}>
                       {p}
                     </SelectItem>

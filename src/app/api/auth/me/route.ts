@@ -1,43 +1,24 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import type { User } from "@supabase/supabase-js";
-import type { UserProfile } from "@/types/auth";
+import { createClient } from "@/libs/supabase/server";
 import { getProfileById } from "@/libs/supabase/queries/profile";
 
 export const dynamic = "force-dynamic";
 
-const mockEmail = process.env.EMAIL ?? "admin@gospelfix.com";
-const adminProfileId = process.env.ADMIN_PROFILE_ID;
-
-const FALLBACK_PROFILE: UserProfile = {
-  id: "mock-user-id",
-  email: mockEmail,
-  full_name: "Admin",
-  avatar_url: null,
-  role: "admin",
-  created_at: "2026-01-01T00:00:00.000Z",
-  updated_at: "2026-01-01T00:00:00.000Z",
-};
-
 export async function GET() {
-  const cookieStore = cookies();
-  const isMock = cookieStore.get("mock-auth")?.value === "true";
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!isMock) {
+  if (!user) {
     return NextResponse.json({ user: null, profile: null }, { status: 401 });
   }
 
-  const profile = adminProfileId ? await getProfileById(adminProfileId) : null;
-  const resolvedProfile = profile ?? FALLBACK_PROFILE;
-
-  const user = {
-    id: resolvedProfile.id,
-    email: resolvedProfile.email,
-    app_metadata: {},
-    user_metadata: {},
-    aud: "authenticated",
-    created_at: resolvedProfile.created_at,
-  } as User;
+  const profile = await getProfileById(user.id);
+  // email은 gangchung_profiles가 아니라 auth.users가 유일한 출처
+  const resolvedProfile = profile
+    ? { ...profile, email: user.email ?? profile.email }
+    : null;
 
   return NextResponse.json({ user, profile: resolvedProfile });
 }

@@ -38,11 +38,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 공개 API 인증은 세션이 아니라 `src/libs/openapi/auth.ts`의 `validateApiKey()`가 `X-API-Key` 헤더를 `INTERNAL_API_KEY` env와 단순 비교하는 방식이다.
 
-### 인증은 현재 Mock — 실제 세션 아님
+### 인증은 Supabase Auth — 회원가입 시 직분(role) 선택
 
-`src/middleware.ts`와 `src/app/api/auth/me/route.ts`는 `mock-auth` 쿠키(`true`/미설정)로만 로그인 여부를 판단한다. 실제 Supabase Auth 세션을 쓰지 않는다 — middleware.ts 주석에 "실서비스 전환 시 Supabase 세션 쿠키로 교체 필요"라고 명시되어 있다. `/`, `/sign/in`, 어드민 경로(`/members`, `/profile`, `/settings`), `/api-docs`의 접근 제어가 전부 이 쿠키 하나에 의존한다.
+`src/middleware.ts`는 `src/libs/supabase/middleware.ts`의 `updateSession()`으로 실제 Supabase 세션을 확인해 `/`, `/sign/in`, 어드민 경로(`/members`, `/profile`, `/settings`), `/api-docs`의 접근을 제어한다(mock-auth 쿠키는 제거됨). 회원가입(`/sign/up`)에서 본인 직분(`초원지기`/`목자`/`목사`/`전도사`, `src/libs/member-roles.ts`의 `PROFILE_ROLES`)을 선택하면 `auth.users` insert 트리거(`handle_new_gangchung_profile`, `supabase/migrations/20261017020000_*.sql`)가 `gangchung_profiles.role`을 채운다. `/api/auth/me`는 `supabase.auth.getUser()` + `getProfileById()`로 실제 프로필을 반환한다.
 
-클라이언트 쪽 인증 상태는 **TanStack Query**로 관리한다(`src/hooks/useAuth.ts`, `src/hooks/useUser.ts`가 `/api/auth/me`를 쿼리 키 `["auth","me"]`로 캐싱). Recoil은 package.json에 의존성이 없고 코드베이스 어디에서도 쓰이지 않는다 — 인증/프로필 접근은 반드시 이 두 훅을 통해서만 한다.
+클라이언트 쪽 인증 상태는 **TanStack Query**로 관리한다(`src/hooks/useAuth.ts`, `src/hooks/useUser.ts`가 `/api/auth/me`를 쿼리 키 `["auth","me"]`로 캐싱). `useAuth()`는 `canManageAllMembers`/`canRunExcelReplace`(role === '목사' | '전도사') 헬퍼를 제공한다. Recoil은 package.json에 의존성이 없고 코드베이스 어디에서도 쓰이지 않는다 — 인증/프로필 접근은 반드시 이 두 훅을 통해서만 한다.
+
+### 권한(RBAC) — 조회는 전체 공개, 쓰기는 역할·트리 스코프로 차등
+
+`gangchung_profiles.role`(`ProfileRole`, `src/types/auth.ts`)은 로그인 가능한 4개 직분(초원지기/목자/목사/전도사)만 허용한다. `목자`/`초원지기`는 `gangchung_profiles.member_id`로 `gangchung_members` 트리의 자기 노드에 연결되고, 쓰기 권한은 그 서브트리로 한정된다(`getDescendantIds`, `src/libs/member-tree.ts` 재사용). 조회(read)는 로그인한 모두에게 공개이며, 생성/수정/삭제 CRUD 단위 권한 판정은 `src/libs/permissions.ts`(`getViewer`, `canCreateMember`, `canUpdateMember`, `canDeleteMember`, `canReplaceAllMembers`)에서 수행하고 `src/app/(admin)/members/actions.ts`·`settings/actions.ts`의 Server Action이 호출한다. 이 프로젝트는 RLS를 쓰지 않으므로(서버 코드 레벨 체크가 보안 모델) 새 쓰기 경로를 추가할 때도 반드시 이 레이어를 통과시켜야 한다. 구성원 엑셀 전체교체(`replace_all_members`)는 `목사`/`전도사`만 가능.
 
 ### Supabase 클라이언트 3종 — 용도별로 엄격히 구분
 
@@ -56,7 +60,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 구성원 계층 구조 (members 도메인)
 
-`src/types/member.ts`의 `Member`는 `position: '초원지기' | '목자' | '목원' | '임원단'`과 자기참조 `parent_id`로 트리를 구성한다 (테이블: `gangchung_members`). `초원지기`는 최상위(`parent_id`는 생성 시 강제로 `null`), `임원단`은 `목자` 레이어 없이 평평하게 묶이는 또 다른 최상위 그룹이다. 어드민 화면(`src/app/(admin)/members/`)은 최상위 리더별 탭으로 그룹핑하고, `목자` 레이어가 없는 평평한 그룹(`임원단`)은 아코디언 없이 바로 렌더링한다. UUID 입력은 어디서든 `members.admin.ts`의 UUID 정규식으로 검증 후 사용한다.
+`src/types/member.ts`의 `Member`는 `position: '초원지기' | '목자' | '목원' | '임원단' | '목사' | '전도사'`와 자기참조 `parent_id`로 트리를 구성한다 (테이블: `gangchung_members`). `초원지기`/`임원단`/`목사`/`전도사`는 최상위(`parent_id`는 생성 시 강제로 `null`), `목자`/`목원`은 하위(`parent_id` 필수) — 이 버킷 구분은 `src/libs/member-roles.ts`의 `TOP_LEVEL_POSITIONS`와 DB의 `gangchung_members_hierarchy_chk` 제약이 같은 기준을 공유한다. `목자` 레이어가 없는 평평한 최상위 그룹(`임원단`/`목사`/`전도사`)은 어드민 화면(`src/app/(admin)/members/`)에서 아코디언 없이 바로 렌더링한다. UUID 입력은 어디서든 `members.admin.ts`의 UUID 정규식으로 검증 후 사용한다. `position`(구성원 트리 직분)과 `role`(로그인 권한, 위 권한 섹션 참고)은 값 일부를 공유하지만 별개의 개념이다 — `목원`/`임원단`은 `position`에만 존재하고 로그인 `role`로는 쓰이지 않는다.
 
 ### 경로 별칭
 
@@ -82,8 +86,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 코드에서 참조하는 변수(`.env.local`에 설정, Vercel에는 Production/Preview 각각 등록 필요):
 
-- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — 브라우저/서버 공용 Supabase 클라이언트
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — 브라우저/서버 공용 Supabase 클라이언트 (Supabase Auth 세션도 이 클라이언트로 처리)
 - `SUPABASE_SERVICE_ROLE_KEY` — 어드민 클라이언트 (서버 전용, 절대 클라이언트에 노출 금지)
 - `INTERNAL_API_KEY` — 공개 API(`/api/v1/*`) `X-API-Key` 검증값
-- `EMAIL`, `PASSWORD` — 목업 로그인 계정 (실제 인증 전환 전까지만 사용)
-- `ADMIN_PROFILE_ID` — `gangchung_profiles` 테이블에서 목업 로그인 사용자와 매핑되는 행의 UUID (미설정 시 `/api/auth/me`가 DB 없이 고정값으로 폴백)
+
+로그인/권한은 이제 Supabase Auth + `gangchung_profiles.role`로 처리하므로 `EMAIL`/`PASSWORD`/`ADMIN_PROFILE_ID` env는 더 이상 쓰지 않는다(제거됨).

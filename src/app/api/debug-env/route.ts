@@ -8,8 +8,6 @@ export function GET() {
   }
 
   return NextResponse.json({
-    EMAIL_set: !!process.env.EMAIL,
-    PASSWORD_set: !!process.env.PASSWORD,
     NODE_ENV: process.env.NODE_ENV,
   });
 }

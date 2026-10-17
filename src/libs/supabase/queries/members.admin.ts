@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/libs/supabase/admin";
 import type { Member, MemberFormInput } from "@/types/member";
-import { POSITIONS, type MemberImportRow } from "@/libs/member-import";
+import type { MemberImportRow } from "@/libs/member-import";
+import { MEMBER_POSITIONS, TOP_LEVEL_POSITIONS } from "@/libs/member-roles";
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -13,7 +14,7 @@ function assertValidUUID(id: string): void {
 function assertValidImportRows(rows: MemberImportRow[]): void {
   for (const row of rows) {
     assertValidUUID(row.id);
-    if (!POSITIONS.includes(row.position))
+    if (!MEMBER_POSITIONS.includes(row.position))
       throw new Error(`유효하지 않은 직분입니다: ${row.position}`);
     if (row.parent_id) assertValidUUID(row.parent_id);
   }
@@ -43,7 +44,9 @@ function toMemberPayload(input: MemberFormInput) {
     age_group: input.age_group || null,
     birth_date: input.birth_date || null,
     position: input.position,
-    parent_id: input.position === "초원지기" ? null : input.parent_id,
+    parent_id: TOP_LEVEL_POSITIONS.includes(input.position)
+      ? null
+      : input.parent_id,
   };
 }
 

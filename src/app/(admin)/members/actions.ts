@@ -6,18 +6,36 @@ import {
   updateMember,
   deleteMember,
   getAllMembers,
+  getMemberByIdAdmin,
   replaceAllMembers,
 } from "@/libs/supabase/queries/members.admin";
-import { buildMembersFromSheetRows } from "@/libs/member-import";
+import {
+  buildMembersFromSheetRows,
+  buildSheetRowsFromMembers,
+} from "@/libs/member-import";
 import type {
   MemberImportRow,
   MemberImportRowError,
 } from "@/libs/member-import";
+import {
+  getViewer,
+  canCreateMember,
+  canUpdateMember,
+  canDeleteMember,
+  canReplaceAllMembers,
+} from "@/libs/permissions";
 import type { Member, MemberFormInput } from "@/types/member";
 
 export async function createMemberAction(
   input: MemberFormInput,
 ): Promise<Member> {
+  const viewer = await getViewer();
+  if (!viewer) throw new Error("로그인이 필요합니다.");
+
+  const allMembers = await getAllMembers();
+  if (!canCreateMember(viewer, input, allMembers)) {
+    throw new Error("이 구성원을 등록할 권한이 없습니다.");
+  }
   return createMember(input);
 }
 
@@ -25,11 +43,50 @@ export async function updateMemberAction(
   id: string,
   input: MemberFormInput,
 ): Promise<Member> {
+  const viewer = await getViewer();
+  if (!viewer) throw new Error("로그인이 필요합니다.");
+
+  const target = await getMemberByIdAdmin(id);
+  if (!target) throw new Error("구성원을 찾을 수 없습니다.");
+
+  const allMembers = await getAllMembers();
+  if (!canUpdateMember(viewer, target, input, allMembers)) {
+    throw new Error("이 구성원을 수정할 권한이 없습니다.");
+  }
   return updateMember(id, input);
 }
 
 export async function deleteMemberAction(id: string): Promise<void> {
+  const viewer = await getViewer();
+  if (!viewer) throw new Error("로그인이 필요합니다.");
+
+  const target = await getMemberByIdAdmin(id);
+  if (!target) throw new Error("구성원을 찾을 수 없습니다.");
+
+  const allMembers = await getAllMembers();
+  if (!canDeleteMember(viewer, target, allMembers)) {
+    throw new Error("이 구성원을 삭제할 권한이 없습니다.");
+  }
   return deleteMember(id);
+}
+
+export async function exportMembersAction(): Promise<{
+  base64: string;
+  filename: string;
+}> {
+  const viewer = await getViewer();
+  if (!viewer) throw new Error("로그인이 필요합니다.");
+
+  const members = await getAllMembers();
+  const sheet = XLSX.utils.json_to_sheet(buildSheetRowsFromMembers(members));
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, sheet, "구성원");
+  const base64 = XLSX.write(workbook, { type: "base64", bookType: "xlsx" });
+
+  return {
+    base64,
+    filename: `구성원_목록_${new Date().toISOString().slice(0, 10)}.xlsx`,
+  };
 }
 
 export interface MemberImportPreview {
@@ -42,6 +99,11 @@ export interface MemberImportPreview {
 export async function previewMemberImportAction(
   formData: FormData,
 ): Promise<MemberImportPreview | { error: string }> {
+  const viewer = await getViewer();
+  if (!viewer || !canReplaceAllMembers(viewer)) {
+    return { error: "구성원 전체 교체 권한이 없습니다." };
+  }
+
   const file = formData.get("file") as File | null;
   if (!file || file.size === 0) return { error: "엑셀 파일을 선택해주세요." };
   if (file.size > 5 * 1024 * 1024)
@@ -77,6 +139,10 @@ export async function confirmMemberImportAction(
   rows: MemberImportRow[],
 ): Promise<{ error: string } | { success: true }> {
   try {
+    const viewer = await getViewer();
+    if (!viewer || !canReplaceAllMembers(viewer)) {
+      return { error: "구성원 전체 교체 권한이 없습니다." };
+    }
     await replaceAllMembers(rows);
     return { success: true };
   } catch (err) {

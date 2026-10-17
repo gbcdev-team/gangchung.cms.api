@@ -1,5 +1,9 @@
 import { randomUUID } from "crypto";
 import type { Member, MemberGender, MemberPosition } from "@/types/member";
+import {
+  MEMBER_POSITIONS as POSITIONS,
+  TOP_LEVEL_POSITIONS,
+} from "@/libs/member-roles";
 
 export type MemberImportRow = Omit<Member, "created_at" | "updated_at">;
 
@@ -13,13 +17,7 @@ export interface MemberImportResult {
   errors: MemberImportRowError[];
 }
 
-export const POSITIONS: MemberPosition[] = [
-  "초원지기",
-  "목자",
-  "목원",
-  "임원단",
-];
-const TOP_LEVEL_POSITIONS: MemberPosition[] = ["초원지기", "임원단"];
+export { POSITIONS };
 const GENDERS: MemberGender[] = ["남", "여"];
 const BIRTH_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -56,7 +54,7 @@ function parseRows(rawRows: Record<string, unknown>[]): {
     if (!POSITIONS.includes(positionRaw as MemberPosition)) {
       errors.push({
         rowNumber,
-        message: `직분 값이 올바르지 않습니다: "${positionRaw}" (초원지기/목자/목원/임원단 중 하나여야 합니다)`,
+        message: `직분 값이 올바르지 않습니다: "${positionRaw}" (초원지기/목자/목원/임원단/목사/전도사 중 하나여야 합니다)`,
       });
       return;
     }
@@ -202,4 +200,19 @@ export function buildMembersFromSheetRows(
     rows: errors.length > 0 ? [] : rows,
     errors,
   };
+}
+
+export function buildSheetRowsFromMembers(
+  members: Member[],
+): Record<string, string>[] {
+  const nameById = new Map(members.map((m) => [m.id, m.name]));
+  return members.map((m) => ({
+    이름: m.name,
+    직분: m.position,
+    상위리더이름: m.parent_id ? (nameById.get(m.parent_id) ?? "") : "",
+    전화번호: m.phone ?? "",
+    성별: m.gender ?? "",
+    나이또래: m.age_group ?? "",
+    생년월일: m.birth_date ?? "",
+  }));
 }

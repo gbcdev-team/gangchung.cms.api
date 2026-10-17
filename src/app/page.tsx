@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { createClient } from "@/libs/supabase/server";
 
-export default function HomePage() {
-  const cookieStore = cookies();
-  const isAuthenticated = cookieStore.get("mock-auth")?.value === "true";
+export default async function HomePage() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!isAuthenticated) {
+  if (!user) {
     redirect("/sign/in");
   }
 

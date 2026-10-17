@@ -1,34 +1,47 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { signUpWithEmail } from '@/libs/supabase/queries/auth';
+import { useState } from "react";
+import { signUpWithEmail } from "@/libs/supabase/queries/auth";
+import { SELF_SERVICE_ROLES } from "@/libs/member-roles";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { ProfileRole } from "@/types/auth";
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const [authError, setAuthError] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<ProfileRole>(SELF_SERVICE_ROLES[0]);
+  const [message, setMessage] = useState("");
+  const [authError, setAuthError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setAuthError('');
-    setMessage('');
+    setAuthError("");
+    setMessage("");
 
     try {
       const { error } = await signUpWithEmail(
         email,
         password,
         `${window.location.origin}/auth/callback`,
+        role,
+        fullName,
       );
       if (error) {
         setAuthError(error);
       } else {
-        setMessage('가입 확인 이메일을 발송했습니다. 이메일을 확인해 주세요.');
+        setMessage("가입 확인 이메일을 발송했습니다. 이메일을 확인해 주세요.");
       }
     } catch {
-      setAuthError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      setAuthError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
       setLoading(false);
     }
@@ -37,11 +50,56 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center">
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 sm:p-10 w-full max-w-md mx-4 sm:mx-0">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">회원가입</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
+          회원가입
+        </h1>
 
         <form onSubmit={handleSignUp} className="flex flex-col gap-5">
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm text-gray-700 dark:text-gray-300">이메일</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              이름
+            </span>
+            <input
+              type="text"
+              placeholder="이름"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 text-sm outline-none focus:border-black dark:focus:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-colors"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              직분
+            </span>
+            <Select
+              value={role}
+              onValueChange={(v) => setRole(v as ProfileRole)}
+            >
+              <SelectTrigger className="w-full px-4 py-3 h-auto text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SELF_SERVICE_ROLES.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {r}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              목사/전도사 권한은 기존 관리자가 별도로 승인해야 합니다.
+            </span>
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              이메일{" "}
+              <span className="text-gray-400 dark:text-gray-500 font-normal">
+                (로그인 아이디로 사용됩니다)
+              </span>
+            </span>
             <input
               type="email"
               placeholder="이메일"
@@ -53,7 +111,9 @@ export default function SignUpPage() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm text-gray-700 dark:text-gray-300">비밀번호 (6자 이상)</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              비밀번호 (6자 이상)
+            </span>
             <input
               type="password"
               placeholder="비밀번호"
@@ -65,21 +125,30 @@ export default function SignUpPage() {
             />
           </label>
 
-          {authError && <p className="text-red-500 text-xs -mt-2">{authError}</p>}
-          {message && <p className="text-green-600 dark:text-green-400 text-xs -mt-2">{message}</p>}
+          {authError && (
+            <p className="text-red-500 text-xs -mt-2">{authError}</p>
+          )}
+          {message && (
+            <p className="text-green-600 dark:text-green-400 text-xs -mt-2">
+              {message}
+            </p>
+          )}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-black dark:bg-white hover:opacity-80 text-white dark:text-black rounded-lg py-3 text-sm font-medium transition-opacity mt-1 disabled:opacity-50"
           >
-            {loading ? '처리 중...' : '회원가입'}
+            {loading ? "처리 중..." : "회원가입"}
           </button>
         </form>
 
         <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
-          이미 계정이 있으신가요?{' '}
-          <a href="/sign/in" className="text-black dark:text-white font-medium hover:underline">
+          이미 계정이 있으신가요?{" "}
+          <a
+            href="/sign/in"
+            className="text-black dark:text-white font-medium hover:underline"
+          >
             로그인
           </a>
         </p>

@@ -1,31 +1,42 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Pencil, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { deleteMemberAction } from './actions';
-import type { Member } from '@/types/member';
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { deleteMemberAction } from "./actions";
+import type { Member } from "@/types/member";
 
-const POSITION_CLASS: Record<Member['position'], string> = {
-  초원지기: 'bg-black text-white dark:bg-white dark:text-black',
-  임원단: 'bg-indigo-600 text-white dark:bg-indigo-400 dark:text-indigo-950',
-  목자: 'bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900',
-  목원: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200',
+const POSITION_CLASS: Record<Member["position"], string> = {
+  초원지기: "bg-black text-white dark:bg-white dark:text-black",
+  임원단: "bg-indigo-600 text-white dark:bg-indigo-400 dark:text-indigo-950",
+  목자: "bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900",
+  목원: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200",
+  목사: "bg-purple-600 text-white dark:bg-purple-400 dark:text-purple-950",
+  전도사: "bg-teal-600 text-white dark:bg-teal-400 dark:text-teal-950",
 };
 
 export function MemberSummary({ member }: { member: Member }) {
-  const detailParts = [member.phone, member.gender, member.age_group, member.birth_date].filter(Boolean);
+  const detailParts = [
+    member.phone,
+    member.gender,
+    member.age_group,
+    member.birth_date,
+  ].filter(Boolean);
   return (
     <span className="flex items-center gap-2.5 flex-wrap text-left">
-      <span className={`px-2 py-0.5 rounded text-xs font-medium shrink-0 ${POSITION_CLASS[member.position]}`}>
+      <span
+        className={`px-2 py-0.5 rounded text-xs font-medium shrink-0 ${POSITION_CLASS[member.position]}`}
+      >
         {member.position}
       </span>
-      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{member.name}</span>
+      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+        {member.name}
+      </span>
       {detailParts.length > 0 && (
-        <span className="text-xs text-gray-400">{detailParts.join(' · ')}</span>
+        <span className="text-xs text-gray-400">{detailParts.join(" · ")}</span>
       )}
     </span>
   );
@@ -43,7 +54,7 @@ export function MemberActions({ member }: { member: Member }) {
       setConfirmOpen(false);
       router.refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '삭제에 실패했습니다.');
+      toast.error(err instanceof Error ? err.message : "삭제에 실패했습니다.");
     } finally {
       setDeleting(false);
     }
@@ -69,7 +80,11 @@ export function MemberActions({ member }: { member: Member }) {
       <ConfirmDialog
         open={confirmOpen}
         title="구성원을 삭제하시겠습니까?"
-        description={deleting ? '삭제 중...' : `${member.name} 님을 삭제합니다. 하위 구성원이 있으면 삭제할 수 없습니다.`}
+        description={
+          deleting
+            ? "삭제 중..."
+            : `${member.name} 님을 삭제합니다. 하위 구성원이 있으면 삭제할 수 없습니다.`
+        }
         onConfirm={handleDelete}
         onCancel={() => setConfirmOpen(false)}
       />

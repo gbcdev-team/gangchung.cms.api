@@ -1,5 +1,6 @@
-export type MemberPosition = '초원지기' | '목자' | '목원' | '임원단';
-export type MemberGender = '남' | '여';
+export type MemberPosition =
+  "초원지기" | "목자" | "목원" | "임원단" | "목사" | "전도사";
+export type MemberGender = "남" | "여";
 
 export interface Member {
   id: string;
@@ -17,7 +18,7 @@ export interface Member {
 export interface MemberFormInput {
   name: string;
   phone: string;
-  gender: MemberGender | '';
+  gender: MemberGender | "";
   age_group: string;
   birth_date: string;
   position: MemberPosition;

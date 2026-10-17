@@ -3,6 +3,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
+import { createClient } from "@/libs/supabase/client";
 import type { UserProfile } from "@/types/auth";
 
 export const AUTH_QUERY_KEY = ["auth", "me"] as const;
@@ -27,10 +28,14 @@ export function useAuth() {
   const user = data?.user ?? null;
   const profile = data?.profile ?? null;
   const isAuthenticated = !isLoading && user !== null;
-  const isAdmin = !isLoading && profile?.role === "admin";
+  const canManageAllMembers =
+    profile?.role === "목사" || profile?.role === "전도사";
+  const canRunExcelReplace =
+    profile?.role === "목사" || profile?.role === "전도사";
 
-  const signOut = () => {
-    document.cookie = "mock-auth=; path=/; max-age=0; SameSite=Strict";
+  const signOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
     queryClient.setQueryData<AuthMeResponse>(AUTH_QUERY_KEY, {
       user: null,
       profile: null,
@@ -43,7 +48,8 @@ export function useAuth() {
     loading: isLoading,
     profile,
     isAuthenticated,
-    isAdmin,
+    canManageAllMembers,
+    canRunExcelReplace,
     signOut,
   };
 }

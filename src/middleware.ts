@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { updateSession } from "@/libs/supabase/middleware";
 
 const ADMIN_PATHS = ["/members", "/profile", "/settings"];
 
@@ -7,7 +8,7 @@ function isPublicApiPath(pathname: string): boolean {
   return pathname.startsWith("/api/v1/") || pathname === "/api/openapi.json";
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // CORS Preflight — 공개 API 경로에 한해서만 처리
@@ -26,42 +27,7 @@ export function middleware(request: NextRequest) {
     });
   }
 
-  // 개발/목업 환경 전용 인증. 실서비스 전환 시 Supabase 세션 쿠키로 교체 필요.
-  const isAuthenticated = request.cookies.get("mock-auth")?.value === "true";
-
-  // /api/auth/me — 인증된 사용자만 접근 가능
-  if (pathname === "/api/auth/me" && !isAuthenticated) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // 루트 접속 → 인증 여부에 따라 분기
-  if (pathname === "/") {
-    const target = isAuthenticated ? "/members" : "/sign/in";
-    return NextResponse.redirect(new URL(target, request.url));
-  }
-
-  // 이미 로그인된 상태에서 /sign/in 접속 → /members로 이동
-  if (pathname === "/sign/in" && isAuthenticated) {
-    return NextResponse.redirect(new URL("/members", request.url));
-  }
-
-  // API 문서 페이지 — 로그인된 관리자만 접근 가능
-  if (pathname === "/api-docs" || pathname.startsWith("/api-docs/")) {
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL("/sign/in", request.url));
-    }
-    return NextResponse.next();
-  }
-
-  // 어드민 경로 미인증 접근 차단
-  const isAdminPath = ADMIN_PATHS.some(
-    (p) => pathname === p || pathname.startsWith(p + "/"),
-  );
-  if (isAdminPath && !isAuthenticated) {
-    return NextResponse.redirect(new URL("/sign/in", request.url));
-  }
-
-  // 공개 API 경로에 CORS 헤더 주입 — X-API-Key 인증이 보안 레이어
+  // 공개 API 경로는 세션 갱신 없이 CORS 헤더만 주입 — X-API-Key 인증이 보안 레이어
   if (isPublicApiPath(pathname)) {
     const response = NextResponse.next();
     response.headers.set("Access-Control-Allow-Origin", "*");
@@ -72,7 +38,49 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  return NextResponse.next();
+  const { supabaseResponse, user } = await updateSession(request);
+  const isAuthenticated = user !== null;
+
+  const redirectWithSession = (url: string) => {
+    const response = NextResponse.redirect(new URL(url, request.url));
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      response.cookies.set(cookie);
+    });
+    return response;
+  };
+
+  // /api/auth/me — 인증된 사용자만 접근 가능
+  if (pathname === "/api/auth/me" && !isAuthenticated) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // 루트 접속 → 인증 여부에 따라 분기
+  if (pathname === "/") {
+    return redirectWithSession(isAuthenticated ? "/members" : "/sign/in");
+  }
+
+  // 이미 로그인된 상태에서 /sign/in 접속 → /members로 이동
+  if (pathname === "/sign/in" && isAuthenticated) {
+    return redirectWithSession("/members");
+  }
+
+  // API 문서 페이지 — 로그인된 관리자만 접근 가능
+  if (pathname === "/api-docs" || pathname.startsWith("/api-docs/")) {
+    if (!isAuthenticated) {
+      return redirectWithSession("/sign/in");
+    }
+    return supabaseResponse;
+  }
+
+  // 어드민 경로 미인증 접근 차단
+  const isAdminPath = ADMIN_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(p + "/"),
+  );
+  if (isAdminPath && !isAuthenticated) {
+    return redirectWithSession("/sign/in");
+  }
+
+  return supabaseResponse;
 }
 
 export const config = {

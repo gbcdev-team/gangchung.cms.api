@@ -67,6 +67,13 @@ export default function SignInPage() {
             로그인
           </button>
         </form>
+
+        <p className="mt-6 text-sm text-gray-500 text-center">
+          계정이 없으신가요?{" "}
+          <a href="/sign/up" className="text-black font-medium hover:underline">
+            회원가입
+          </a>
+        </p>
       </div>
     </div>
   );

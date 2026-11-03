@@ -16,10 +16,15 @@ export default function SignInPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const result = await signInAction(email, password);
-    // 성공 시 서버에서 redirect 되므로 에러일 때만 로딩을 해제한다
-    if (result?.error) {
-      setError(result.error);
+    try {
+      const result = await signInAction(email, password);
+      // 성공 시 서버에서 redirect 되므로 에러일 때만 로딩을 해제한다
+      if (result?.error) {
+        setError(result.error);
+        setLoading(false);
+      }
+    } catch {
+      setError("로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
       setLoading(false);
     }
   };

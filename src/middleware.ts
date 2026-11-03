@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { updateSession } from "@/libs/supabase/middleware";
 
-const ADMIN_PATHS = ["/members", "/profile", "/settings"];
+const ADMIN_PATHS = ["/members", "/ministry-history", "/profile", "/settings"];
 
 function isPublicApiPath(pathname: string): boolean {
   return pathname.startsWith("/api/v1/") || pathname === "/api/openapi.json";
@@ -92,6 +92,7 @@ export const config = {
     "/api/openapi.json",
     "/api-docs/:path*",
     "/members/:path*",
+    "/ministry-history/:path*",
     "/profile/:path*",
     "/settings/:path*",
   ],

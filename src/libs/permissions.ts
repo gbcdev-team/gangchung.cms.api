@@ -54,6 +54,11 @@ export function canReplaceAllMembers(viewer: Viewer): boolean {
   return viewer.profile.role === "목사" || viewer.profile.role === "전도사";
 }
 
+// 지난 사역 히스토리 글의 작성/수정/삭제/정렬은 목사/전도사만 가능하다.
+export function canManageMinistryHistory(viewer: Viewer): boolean {
+  return viewer.profile.role === "목사" || viewer.profile.role === "전도사";
+}
+
 export function canCreateMember(
   viewer: Viewer,
   input: MemberFormInput,

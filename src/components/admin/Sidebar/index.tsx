@@ -18,7 +18,10 @@ import { useMobileMenu } from "@/components/admin/MobileMenuContext";
 
 type NavItem = { label: string; href: string; external?: boolean };
 
-const NAV_ITEMS: NavItem[] = [{ label: "구성원 관리", href: "/members" }];
+const NAV_ITEMS: NavItem[] = [
+  { label: "구성원 관리", href: "/members" },
+  { label: "지난 사역 히스토리", href: "/ministry-history" },
+];
 
 type PopupLinkItem = {
   type: "link";

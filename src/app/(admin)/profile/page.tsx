@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useUser } from "@/hooks/useUser";
 import { updateProfileAction } from "./actions";
+import PasswordCard from "./PasswordCard";
 
 const schema = z.object({
   full_name: z
@@ -235,6 +236,8 @@ export default function ProfilePage() {
             </button>
           </div>
         </div>
+
+        <PasswordCard />
       </div>
 
       <input

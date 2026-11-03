@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { ProfileRole } from "@/types/auth";
+import PasswordInput from "@/components/ui/password-input";
 
 export default function SignUpPage() {
   const [fullName, setFullName] = useState("");
@@ -114,8 +115,7 @@ export default function SignUpPage() {
             <span className="text-sm text-gray-700 dark:text-gray-300">
               비밀번호 (6자 이상)
             </span>
-            <input
-              type="password"
+            <PasswordInput
               placeholder="비밀번호"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

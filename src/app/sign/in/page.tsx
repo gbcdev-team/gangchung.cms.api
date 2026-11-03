@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { signInAction } from "./actions";
+import PasswordInput from "@/components/ui/password-input";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -49,8 +50,7 @@ export default function SignInPage() {
 
           <label className="flex flex-col gap-1.5">
             <span className="text-sm text-gray-700">비밀번호</span>
-            <input
-              type="password"
+            <PasswordInput
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

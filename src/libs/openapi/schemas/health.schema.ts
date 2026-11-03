@@ -12,6 +12,7 @@ export const HealthResponseSchema = z
 
 export function registerHealthPaths(reg: OpenAPIRegistry) {
   reg.registerPath({
+    tags: ['시스템'],
     method: 'get',
     path: '/api/v1/health',
     summary: 'Health Check',

@@ -33,6 +33,7 @@ export const PortfolioDetailResponseSchema = z
 
 export function registerPortfolioPaths(reg: OpenAPIRegistry) {
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/portfolio',
     summary: '포트폴리오 목록 조회',
@@ -51,6 +52,7 @@ export function registerPortfolioPaths(reg: OpenAPIRegistry) {
   });
 
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/portfolio/{id}',
     summary: '포트폴리오 단건 조회',

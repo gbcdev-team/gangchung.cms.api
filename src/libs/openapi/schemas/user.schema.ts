@@ -29,6 +29,7 @@ export const UserDetailResponseSchema = z
 
 export function registerUserPaths(reg: OpenAPIRegistry) {
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/users',
     summary: '유저 목록 조회',
@@ -47,6 +48,7 @@ export function registerUserPaths(reg: OpenAPIRegistry) {
   });
 
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/users/{id}',
     summary: '유저 단건 조회',

@@ -33,6 +33,7 @@ export const BlogDetailResponseSchema = z
 
 export function registerBlogPaths(reg: OpenAPIRegistry) {
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/blog',
     summary: '발행된 블로그 포스트 목록 조회',
@@ -57,6 +58,7 @@ export function registerBlogPaths(reg: OpenAPIRegistry) {
   });
 
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/blog/{slug}',
     summary: '블로그 포스트 단건 조회',

@@ -32,6 +32,7 @@ export const OrderDetailResponseSchema = z
 
 export function registerOrderPaths(reg: OpenAPIRegistry) {
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/orders',
     summary: '주문 목록 조회',
@@ -50,6 +51,7 @@ export function registerOrderPaths(reg: OpenAPIRegistry) {
   });
 
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/orders/{id}',
     summary: '주문 단건 조회',

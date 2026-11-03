@@ -45,6 +45,7 @@ export const ProductDetailResponseSchema = z
 
 export function registerProductPaths(reg: OpenAPIRegistry) {
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/products',
     summary: '활성 상품 목록 조회',
@@ -69,6 +70,7 @@ export function registerProductPaths(reg: OpenAPIRegistry) {
   });
 
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/products/{id}',
     summary: '상품 단건 조회',

@@ -40,6 +40,7 @@ export const QuoteDetailResponseSchema = z
 
 export function registerQuotePaths(reg: OpenAPIRegistry) {
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/quotes',
     summary: '견적 신청 목록 조회',
@@ -58,6 +59,7 @@ export function registerQuotePaths(reg: OpenAPIRegistry) {
   });
 
   reg.registerPath({
+    tags: ['기타 리소스'],
     method: 'get',
     path: '/api/v1/quotes/{id}',
     summary: '견적 신청 단건 조회',

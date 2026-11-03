@@ -34,7 +34,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `identifier_column`/`identifier_type` — 단건 조회 키와 타입(`uuid` | `text`, uuid면 정규식 검증)
 - `select_columns`, `order_column`/`order_direction`, `is_enabled`
 
-이 패턴 때문에 "새 리소스 추가"는 거의 항상 **DB 설정 변경**이지 **코드 변경**이 아니다. `src/libs/openapi/schemas/*.schema.ts`와 `registry.ts`/`dynamic-spec.ts`는 이 동적 리소스들에 대한 Swagger 문서(`/api-docs`, `/api/openapi.json`)를 생성하기 위한 레이어로, 실제 라우팅 로직과는 분리되어 있다.
+이 패턴 때문에 "새 리소스 추가"는 API 동작만 보면 **DB 설정 변경**이지 **코드 변경**이 아니다. 단, `statkit_content_api_configs` 테이블 자체는 `supabase/migrations/20261103040000_*.sql`이 만든다(행은 같은 방식으로 upsert). `src/libs/openapi/schemas/*.schema.ts`와 `registry.ts`/`dynamic-spec.ts`는 이 동적 리소스들에 대한 Swagger 문서(`/api-docs`, `/api/openapi.json`)를 생성하기 위한 레이어로, 실제 라우팅 로직과는 분리되어 있다. **문서에 노출하려면** config 행 외에 스키마 파일을 만들어 `dynamic-spec.ts`의 `TYPED_SLUGS`에 등록해야 하며, `registerPath`의 `tags`는 `교회 콘텐츠`/`시스템`/`기타 리소스` 중 하나로 맞춘다(그룹 순서·설명은 `dynamic-spec.ts`의 `tags`).
 
 공개 API 인증은 세션이 아니라 `src/libs/openapi/auth.ts`의 `validateApiKey()`가 `X-API-Key` 헤더를 `INTERNAL_API_KEY` env와 단순 비교하는 방식이다.
 

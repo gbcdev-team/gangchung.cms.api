@@ -20,9 +20,13 @@ function toMinistryHistory(row: any): MinistryHistory {
   return {
     id: row.id,
     title: row.title,
+    subtitle: row.subtitle ?? null,
     slug: row.slug,
     thumbnail_url: row.thumbnail_url ?? null,
     category: row.category ?? null,
+    date_text: row.date_text ?? null,
+    summary: row.summary ?? null,
+    buttons: Array.isArray(row.buttons) ? row.buttons : [],
     content: row.content ?? null,
     is_published: row.is_published,
     sort_order: row.sort_order,
@@ -34,8 +38,12 @@ function toMinistryHistory(row: any): MinistryHistory {
 function toPayload(input: MinistryHistoryFormInput) {
   return {
     title: input.title,
+    subtitle: input.subtitle || null,
     slug: input.slug,
     category: input.category || null,
+    date_text: input.date_text || null,
+    summary: input.summary || null,
+    buttons: input.buttons,
     content: input.content || null,
     is_published: input.is_published,
   };

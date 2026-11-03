@@ -51,9 +51,9 @@ export async function buildDynamicOpenApiSpec(
   return generator.generateDocument({
     openapi: "3.1.0",
     info: {
-      title: "GospelFix CMS API",
+      title: "GangChung CMS API",
       version: "1.0.0",
-      description: "GospelFix 관리자 CMS의 REST API 문서입니다.",
+      description: "GangChung 관리자 CMS의 REST API 문서입니다.",
     },
     servers: [{ url: baseUrl, description: "API Server" }],
     // 표시 순서와 그룹 설명. 새 slug를 TYPED_SLUGS에 추가할 때 스키마의 tags를 이 중 하나로 맞춘다.

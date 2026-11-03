@@ -340,7 +340,7 @@ export default function HistoryForm({
           </div>
         </div>
 
-        <div className="w-full lg:w-64 shrink-0 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 space-y-3">
+        <div className="w-full lg:w-64 shrink-0 lg:sticky lg:top-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 space-y-3">
           <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? "저장 중..." : isPublished ? "발행" : "임시저장"}
           </Button>

@@ -20,7 +20,7 @@ export default async function AdminLayout({
 
   return (
     <MobileMenuProvider>
-      <div className="min-h-screen overflow-x-hidden bg-gray-100 dark:bg-gray-900">
+      <div className="min-h-screen overflow-x-clip bg-gray-100 dark:bg-gray-900">
         <AdminShell>
           <div className="flex gap-3 p-3 pt-[68px] lg:pt-3">
             <Sidebar />

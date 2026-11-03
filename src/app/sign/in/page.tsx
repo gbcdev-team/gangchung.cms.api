@@ -74,9 +74,15 @@ export default function SignInPage() {
           <button
             type="submit"
             disabled={loading}
+            aria-busy={loading}
             className="w-full bg-black hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed text-white rounded-lg py-3 text-sm font-medium transition-colors mt-1 flex items-center justify-center gap-2"
           >
-            {loading && <LoaderCircle className="h-4 w-4 animate-spin" />}
+            {loading && (
+              <LoaderCircle
+                className="h-4 w-4 animate-spin"
+                aria-hidden="true"
+              />
+            )}
             {loading ? "로그인 중..." : "로그인"}
           </button>
         </form>

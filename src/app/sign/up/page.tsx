@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LoaderCircle } from "lucide-react";
 import { signUpWithEmail } from "@/libs/supabase/queries/auth";
 import { SELF_SERVICE_ROLES } from "@/libs/member-roles";
 import {
@@ -137,8 +138,9 @@ export default function SignUpPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black dark:bg-white hover:opacity-80 text-white dark:text-black rounded-lg py-3 text-sm font-medium transition-opacity mt-1 disabled:opacity-50"
+            className="w-full bg-black dark:bg-white hover:opacity-80 text-white dark:text-black rounded-lg py-3 text-sm font-medium transition-opacity mt-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
+            {loading && <LoaderCircle className="h-4 w-4 animate-spin" />}
             {loading ? "처리 중..." : "회원가입"}
           </button>
         </form>

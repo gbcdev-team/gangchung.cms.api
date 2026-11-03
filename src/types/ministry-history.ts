@@ -60,7 +60,6 @@ export const ministryHistoryFormSchema = z.object({
       MAX_HISTORY_BUTTONS,
       `버튼은 최대 ${MAX_HISTORY_BUTTONS}개까지 추가할 수 있습니다.`,
     ),
-  content: z.string().max(500_000),
   is_published: z.boolean(),
 });
 

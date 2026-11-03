@@ -44,7 +44,6 @@ function toPayload(input: MinistryHistoryFormInput) {
     date_text: input.date_text || null,
     summary: input.summary || null,
     buttons: input.buttons,
-    content: input.content || null,
     is_published: input.is_published,
   };
 }

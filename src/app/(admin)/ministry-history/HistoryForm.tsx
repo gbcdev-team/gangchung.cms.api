@@ -16,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import RichTextEditor from "@/components/admin/RichTextEditor";
 import {
   createMinistryHistoryAction,
   updateMinistryHistoryAction,
@@ -64,7 +63,6 @@ export default function HistoryForm({
       date_text: history?.date_text ?? "",
       summary: history?.summary ?? "",
       buttons: history?.buttons ?? [],
-      content: history?.content ?? "",
       is_published: history?.is_published ?? false,
     },
   });
@@ -334,18 +332,6 @@ export default function HistoryForm({
               </div>
             ))}
           </div>
-
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>본문</FormLabel>
-                <RichTextEditor value={field.value} onChange={field.onChange} />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
 
         <div className="w-full lg:w-64 shrink-0 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 space-y-3">

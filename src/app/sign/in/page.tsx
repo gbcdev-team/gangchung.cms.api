@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { LoaderCircle } from "lucide-react";
 import { signInAction } from "./actions";
 import PasswordInput from "@/components/ui/password-input";
 
@@ -9,12 +10,17 @@ export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
     const result = await signInAction(email, password);
+    // 성공 시 서버에서 redirect 되므로 에러일 때만 로딩을 해제한다
     if (result?.error) {
       setError(result.error);
+      setLoading(false);
     }
   };
 
@@ -62,9 +68,11 @@ export default function SignInPage() {
 
           <button
             type="submit"
-            className="w-full bg-black hover:bg-gray-800 text-white rounded-lg py-3 text-sm font-medium transition-colors mt-1"
+            disabled={loading}
+            className="w-full bg-black hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed text-white rounded-lg py-3 text-sm font-medium transition-colors mt-1 flex items-center justify-center gap-2"
           >
-            로그인
+            {loading && <LoaderCircle className="h-4 w-4 animate-spin" />}
+            {loading ? "로그인 중..." : "로그인"}
           </button>
         </form>
 

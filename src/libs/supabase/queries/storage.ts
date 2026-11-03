@@ -8,6 +8,7 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/png": "png",
   "image/gif": "gif",
   "image/webp": "webp",
+  "image/avif": "avif",
 };
 
 export async function uploadImage(

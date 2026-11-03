@@ -28,7 +28,13 @@ import {
 } from "@/types/ministry-history";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-const IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+const IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/avif",
+];
 
 const formSchema = ministryHistoryFormSchema;
 
@@ -81,7 +87,7 @@ export default function HistoryForm({
     e.target.value = "";
     if (!file) return;
     if (!IMAGE_TYPES.includes(file.type)) {
-      toast.error("JPG, PNG, GIF, WebP 이미지만 사용할 수 있습니다.");
+      toast.error("JPG, PNG, GIF, WebP, AVIF 이미지만 사용할 수 있습니다.");
       return;
     }
     if (file.size > MAX_IMAGE_SIZE) {
@@ -185,7 +191,7 @@ export default function HistoryForm({
             <p className="text-sm font-medium">
               대표 이미지{" "}
               <span className="text-xs font-normal text-gray-400">
-                권장 사이즈: 800 × 1200px (2 : 3) · JPG, PNG, GIF, WebP · 최대
+                권장 사이즈: 800 × 1200px (2 : 3) · JPG, PNG, GIF, WebP, AVIF · 최대
                 5MB
               </span>
             </p>
